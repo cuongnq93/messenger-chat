@@ -52,6 +52,7 @@ export function ChatMain({ selectedUser }: { selectedUser: User | null }) {
     } else {
       setMessages(data || [])
     }
+    setTimeout(scrollToBottom, 100)
   }
 
   function subscribeToMessages() {
@@ -100,7 +101,7 @@ export function ChatMain({ selectedUser }: { selectedUser: User | null }) {
 
   function scrollToBottom() {
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' })
+      scrollAreaRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' })
     }
   }
 
@@ -119,7 +120,7 @@ export function ChatMain({ selectedUser }: { selectedUser: User | null }) {
           <div className="font-semibold">{selectedUser.email}</div>
         </div>
       </div>
-      <ScrollArea className="flex-1 p-4" viewportRef={scrollAreaRef}>
+      <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           {messages.map((message) => (
             <div key={message.id} className={`flex ${message.sender_id === selectedUser.id ? 'justify-start' : 'justify-end'}`}>
@@ -128,6 +129,7 @@ export function ChatMain({ selectedUser }: { selectedUser: User | null }) {
               </div>
             </div>
           ))}
+          <div className="w-1 h-0" ref={scrollAreaRef} />
         </div>
       </ScrollArea>
       <div className="border-t p-4 flex items-center">
