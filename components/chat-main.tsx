@@ -112,10 +112,10 @@ export function ChatMain({ selectedUser }: { selectedUser: User | null }) {
   }
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col bg-white">
       <div className="border-b p-4 flex items-center">
         <Avatar className="w-10 h-10 mr-4">
-          <AvatarImage src={`https://i.pravatar.cc/40?u=${selectedUser.id}`} />
+          <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${selectedUser.email}`} />
           <AvatarFallback>{selectedUser.email[0].toUpperCase()}</AvatarFallback>
         </Avatar>
         <div>

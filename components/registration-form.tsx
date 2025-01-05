@@ -6,39 +6,47 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { RegistrationForm } from './registration-form'
 
-export function AuthForm() {
+export function RegistrationForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [isLogin, setIsLogin] = useState(true)
+  const [success, setSuccess] = useState<string | null>(null)
 
   const supabase = createSupabaseClient()
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) setError(error.message)
+    setSuccess(null)
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match")
+      setLoading(false)
+      return
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`
+      }
+    })
+
+    if (error) {
+      setError(error.message)
+    } else {
+      setSuccess("Registration successful! Please check your email to confirm your account.")
+    }
     setLoading(false)
   }
 
-  if (!isLogin) {
-    return (
-      <div className="space-y-4">
-        <RegistrationForm />
-        <Button variant="link" onClick={() => setIsLogin(true)} className="w-full">
-          Already have an account? Log in
-        </Button>
-      </div>
-    )
-  }
-
   return (
-    <form onSubmit={handleLogin} className="space-y-4">
+    <form onSubmit={handleRegister} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input
@@ -61,17 +69,30 @@ export function AuthForm() {
           required
         />
       </div>
+      <div className="space-y-2">
+        <Label htmlFor="confirmPassword">Confirm Password</Label>
+        <Input
+          id="confirmPassword"
+          type="password"
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
+      </div>
       <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? 'Logging in...' : 'Log in'}
+        {loading ? 'Registering...' : 'Register'}
       </Button>
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-      <Button variant="link" onClick={() => setIsLogin(false)} className="w-full">
-        Don't have an account? Register
-      </Button>
+      {success && (
+        <Alert>
+          <AlertDescription>{success}</AlertDescription>
+        </Alert>
+      )}
     </form>
   )
 }
