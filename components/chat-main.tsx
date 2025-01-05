@@ -52,7 +52,7 @@ export function ChatMain({ selectedUser }: { selectedUser: User | null }) {
     } else {
       setMessages(data || [])
     }
-    setTimeout(scrollToBottom, 100)
+    scrollToBottom()
   }
 
   function subscribeToMessages() {
@@ -84,11 +84,11 @@ export function ChatMain({ selectedUser }: { selectedUser: User | null }) {
       })
       .select()
 
+    scrollToBottom()
     if (error) {
       console.error('Error sending message:', error)
     } else {
       setNewMessage('')
-      scrollToBottom()
       // Update last interaction
       await supabase
         .from('user_interactions')
@@ -101,7 +101,9 @@ export function ChatMain({ selectedUser }: { selectedUser: User | null }) {
 
   function scrollToBottom() {
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' })
+      setTimeout(() => {
+        scrollAreaRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' })
+      }, 150)
     }
   }
 
@@ -129,7 +131,7 @@ export function ChatMain({ selectedUser }: { selectedUser: User | null }) {
               </div>
             </div>
           ))}
-          <div className="w-1 h-0" ref={scrollAreaRef} />
+          <div ref={scrollAreaRef} />
         </div>
       </ScrollArea>
       <div className="border-t p-4 flex items-center">
